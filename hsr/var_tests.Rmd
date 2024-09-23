@@ -1,0 +1,87 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+bests_weat = read.table('results/bests_hsr_weat.csv',header=TRUE,sep = ',')
+bests_rnd = read.table('results/bests_hsr_rnd.csv',header=TRUE,sep = ',')
+bests_ripa = read.table('results/bests_hsr_ripa.csv',header=TRUE,sep = ',')
+bests_rnsb = read.table('results/bests_hsr_rnsb.csv',header=TRUE,sep = ',')
+bests_ect = read.table('results/bests_hsr_ect.csv',header=TRUE,sep = ',')
+bests_weates = read.table('results/bests_hsr_weates.csv',header=TRUE,sep = ',')
+```
+
+
+
+```{r}
+bests_weat
+```
+```{r}
+var.test_mine <- function(x, y=NULL,
+                     alternative='two.sided',
+                     null.value=1, conf.level=0.95) {
+
+  # Checking if the information is correct
+  if (! is.numeric(x))
+    stop(paste("The x vector must be numeric", "\n", ""))
+  if (length(x) <= 1)
+    stop(paste("not enough 'x' observations", "\n", ""))
+
+  if (! is.null(y)) {
+    if (! is.numeric(y))
+      stop(paste("The y vector must be numeric", "\n", ""))
+    if (length(y) <= 1)
+      stop(paste("not enough 'y' observations", "\n", ""))
+  }
+
+  # To check if the null.value is positive
+  if(null.value <= 0)
+    stop(paste("The null value must be positive", "\n", ""))
+
+  # Argument Verification Using Partial Matching
+  alternative <- match.arg(arg=alternative,
+                           choices=c("two.sided","greater","less"))
+
+  # The next variable is used to indicate if we have raw o summarized data
+  raw.data <- TRUE
+  name_x <- deparse(substitute(x))
+  name_y <- deparse(substitute(y))
+
+  if (is.null(y))
+    res <- var_test_one(var(x), length(x), alternative,
+                        conf.level, null.value,
+                        raw.data, name_x)
+  else
+    res <- var_test_two(var(x), length(x), var(y), length(y),
+                        alternative, conf.level, null.value,
+                        raw.data, name_x, name_y)
+
+  class(res) <- "htest"
+  res
+}
+```
+
+```{r}
+var.test_mine(x=bests_weat$Weat, alternative='greater',
+                 null.value=0, conf.level=0.95)
+```
+```{r}
+contenido <- c(510, 492, 494, 498, 492,
+               496, 502, 491, 507, 496)
+
+var.test(x=contenido, alternative='greater',
+                 null.value=40, conf.level=0.95)
+```
+
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
